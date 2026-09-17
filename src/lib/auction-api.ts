@@ -152,7 +152,7 @@ export async function placeBid(
     p_auction_id: auctionId,
     p_amount: amount,
     p_payment_ack: paymentAck,
-    p_amount_inr: amountInr ?? undefined,
+    ...(amountInr === null || amountInr === undefined ? {} : { p_amount_inr: amountInr }),
   });
   if (error) return { ok: false, reason: error.message };
   return data as unknown as BidResult;
