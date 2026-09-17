@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      auction_events: {
+        Row: {
+          actor_id: string | null
+          auction_id: string
+          created_at: string
+          details: Json
+          event_type: string
+          id: string
+          summary: string
+        }
+        Insert: {
+          actor_id?: string | null
+          auction_id: string
+          created_at?: string
+          details?: Json
+          event_type: string
+          id?: string
+          summary: string
+        }
+        Update: {
+          actor_id?: string | null
+          auction_id?: string
+          created_at?: string
+          details?: Json
+          event_type?: string
+          id?: string
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_events_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       auction_messages: {
         Row: {
           auction_id: string
@@ -135,6 +173,77 @@ export type Database = {
           },
         ]
       }
+      notification_preferences: {
+        Row: {
+          email_auction_closed: boolean
+          email_new_bids: boolean
+          in_app_auction_closed: boolean
+          in_app_new_bids: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          email_auction_closed?: boolean
+          email_new_bids?: boolean
+          in_app_auction_closed?: boolean
+          in_app_new_bids?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          email_auction_closed?: boolean
+          email_new_bids?: boolean
+          in_app_auction_closed?: boolean
+          in_app_new_bids?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          auction_id: string | null
+          body: string
+          created_at: string
+          id: string
+          notification_type: string
+          payload: Json
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          auction_id?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          notification_type: string
+          payload?: Json
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          auction_id?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          notification_type?: string
+          payload?: Json
+          read_at?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -153,19 +262,52 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       check_auction_invariant: { Args: { p_auction_id: string }; Returns: Json }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       place_bid: {
         Args: { p_amount: number; p_auction_id: string }
         Returns: Json
       }
+      set_admin_role: {
+        Args: { p_enabled: boolean; p_user_id: string }
+        Returns: boolean
+      }
+      sync_auction_close: { Args: { p_auction_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -292,6 +434,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
