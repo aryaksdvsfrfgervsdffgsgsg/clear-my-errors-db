@@ -372,6 +372,14 @@ export type Database = {
         Args: { p_auction_id: string; p_email: string }
         Returns: Json
       }
+      is_auction_owner: {
+        Args: { _auction_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_auction_participant: {
+        Args: { _auction_id: string; _user_id: string }
+        Returns: boolean
+      }
       join_private_auction: { Args: { p_auction_id: string }; Returns: Json }
       place_bid: {
         Args: {
