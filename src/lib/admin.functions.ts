@@ -13,7 +13,8 @@ const filtersSchema = z.object({
   status: z.string().max(30).optional(),
 });
 
-type AdminContext = { supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> }; userId: string };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AdminContext = { supabase: any; userId: string };
 
 async function requireAdmin(context: AdminContext) {
   const { data, error } = await context.supabase.rpc("has_role", {
