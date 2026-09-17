@@ -14,13 +14,155 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      auction_messages: {
+        Row: {
+          auction_id: string
+          content: string
+          created_at: string
+          id: string
+          sender_name: string
+          user_id: string
+        }
+        Insert: {
+          auction_id: string
+          content: string
+          created_at?: string
+          id?: string
+          sender_name?: string
+          user_id: string
+        }
+        Update: {
+          auction_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          sender_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_messages_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auctions: {
+        Row: {
+          bid_count: number
+          created_at: string
+          current_price: number
+          description: string
+          ends_at: string | null
+          id: string
+          last_seq: number
+          leader_id: string | null
+          min_increment: number
+          owner_id: string
+          starting_price: number
+          status: string
+          title: string
+        }
+        Insert: {
+          bid_count?: number
+          created_at?: string
+          current_price?: number
+          description?: string
+          ends_at?: string | null
+          id?: string
+          last_seq?: number
+          leader_id?: string | null
+          min_increment?: number
+          owner_id: string
+          starting_price?: number
+          status?: string
+          title: string
+        }
+        Update: {
+          bid_count?: number
+          created_at?: string
+          current_price?: number
+          description?: string
+          ends_at?: string | null
+          id?: string
+          last_seq?: number
+          leader_id?: string | null
+          min_increment?: number
+          owner_id?: string
+          starting_price?: number
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      bids: {
+        Row: {
+          amount: number
+          auction_id: string
+          bidder_id: string
+          bidder_name: string
+          created_at: string
+          id: string
+          seq: number
+        }
+        Insert: {
+          amount: number
+          auction_id: string
+          bidder_id: string
+          bidder_name?: string
+          created_at?: string
+          id?: string
+          seq: number
+        }
+        Update: {
+          amount?: number
+          auction_id?: string
+          bidder_id?: string
+          bidder_name?: string
+          created_at?: string
+          id?: string
+          seq?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bids_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_auction_invariant: { Args: { p_auction_id: string }; Returns: Json }
+      place_bid: {
+        Args: { p_amount: number; p_auction_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
