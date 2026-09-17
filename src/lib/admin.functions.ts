@@ -13,10 +13,9 @@ const filtersSchema = z.object({
   status: z.string().max(30).optional(),
 });
 
-async function requireAdmin(context: {
-  supabase: Parameters<Parameters<typeof requireSupabaseAuth>[0]>[0] extends never ? never : any;
-  userId: string;
-}) {
+type AdminContext = { supabase: { rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }> }; userId: string };
+
+async function requireAdmin(context: AdminContext) {
   const { data, error } = await context.supabase.rpc("has_role", {
     _user_id: context.userId,
     _role: "admin",
