@@ -87,6 +87,44 @@ export type Database = {
           },
         ]
       }
+      auction_participants: {
+        Row: {
+          auction_id: string
+          created_at: string
+          id: string
+          invited_by: string | null
+          joined_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          auction_id: string
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          auction_id?: string
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auction_participants_auction_id_fkey"
+            columns: ["auction_id"]
+            isOneToOne: false
+            referencedRelation: "auctions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       auctions: {
         Row: {
           bid_count: number
@@ -95,13 +133,22 @@ export type Database = {
           description: string
           ends_at: string | null
           id: string
+          item_count: number
           last_seq: number
           leader_id: string | null
+          leader_name: string | null
+          listing_currency: string
+          locked: boolean
           min_increment: number
           owner_id: string
+          participant_limit: number | null
+          payment_confirmed_at: string | null
+          payment_confirmed_by: string | null
           starting_price: number
+          starts_at: string | null
           status: string
           title: string
+          visibility: string
         }
         Insert: {
           bid_count?: number
@@ -110,13 +157,22 @@ export type Database = {
           description?: string
           ends_at?: string | null
           id?: string
+          item_count?: number
           last_seq?: number
           leader_id?: string | null
+          leader_name?: string | null
+          listing_currency?: string
+          locked?: boolean
           min_increment?: number
           owner_id: string
+          participant_limit?: number | null
+          payment_confirmed_at?: string | null
+          payment_confirmed_by?: string | null
           starting_price?: number
+          starts_at?: string | null
           status?: string
           title: string
+          visibility?: string
         }
         Update: {
           bid_count?: number
@@ -125,42 +181,57 @@ export type Database = {
           description?: string
           ends_at?: string | null
           id?: string
+          item_count?: number
           last_seq?: number
           leader_id?: string | null
+          leader_name?: string | null
+          listing_currency?: string
+          locked?: boolean
           min_increment?: number
           owner_id?: string
+          participant_limit?: number | null
+          payment_confirmed_at?: string | null
+          payment_confirmed_by?: string | null
           starting_price?: number
+          starts_at?: string | null
           status?: string
           title?: string
+          visibility?: string
         }
         Relationships: []
       }
       bids: {
         Row: {
           amount: number
+          amount_inr: number | null
           auction_id: string
           bidder_id: string
           bidder_name: string
           created_at: string
           id: string
+          payment_ack: boolean
           seq: number
         }
         Insert: {
           amount: number
+          amount_inr?: number | null
           auction_id: string
           bidder_id: string
           bidder_name?: string
           created_at?: string
           id?: string
+          payment_ack?: boolean
           seq: number
         }
         Update: {
           amount?: number
+          amount_inr?: number | null
           auction_id?: string
           bidder_id?: string
           bidder_name?: string
           created_at?: string
           id?: string
+          payment_ack?: boolean
           seq?: number
         }
         Relationships: [
@@ -289,6 +360,7 @@ export type Database = {
     }
     Functions: {
       check_auction_invariant: { Args: { p_auction_id: string }; Returns: Json }
+      confirm_auction_payment: { Args: { p_auction_id: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -296,8 +368,18 @@ export type Database = {
         }
         Returns: boolean
       }
+      invite_to_auction: {
+        Args: { p_auction_id: string; p_email: string }
+        Returns: Json
+      }
+      join_private_auction: { Args: { p_auction_id: string }; Returns: Json }
       place_bid: {
-        Args: { p_amount: number; p_auction_id: string }
+        Args: {
+          p_amount: number
+          p_amount_inr?: number
+          p_auction_id: string
+          p_payment_ack?: boolean
+        }
         Returns: Json
       }
       set_admin_role: {
@@ -305,6 +387,7 @@ export type Database = {
         Returns: boolean
       }
       sync_auction_close: { Args: { p_auction_id: string }; Returns: boolean }
+      sync_auction_start: { Args: { p_auction_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
